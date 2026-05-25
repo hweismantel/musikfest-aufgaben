@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aufgaben-Tracker · Musikfest 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --border: #ddd9d0;
+    --border-light: #ede9e2;
+    --text: #1a1815;
+    --text-muted: #7a7570;
+    --text-hint: #b0aba4;
+    --accent: #2d5a3d;
+    --accent-light: #e8f0eb;
+    --accent-text: #1a3d28;
+    --danger: #8b2020;
+    --danger-light: #fdf0f0;
+    --warn: #7a5c10;
+    --warn-light: #fdf8ec;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --radius: 6px;
+    --radius-lg: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── CONFIG OVERLAY ── */
+  #configOverlay {
+    position: fixed; inset: 0; background: rgba(26,24,21,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; backdrop-filter: blur(2px);
+  }
+  #configOverlay.hidden { display: none; }
+  .config-card {
+    background: var(--surface); border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    padding: 2rem; width: min(440px, 92vw);
+  }
+  .config-card h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .config-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+  .config-field { margin-bottom: 1rem; }
+  .config-field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; font-family: var(--mono); }
+  .config-field input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: var(--mono); background: var(--bg); color: var(--text); }
+  .config-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .config-hint { font-size: 11px; color: var(--text-hint); margin-top: 4px; }
+  .btn-primary { width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; }
+  .btn-primary:hover { background: var(--accent-text); }
+  .config-skip { display: block; text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-hint); cursor: pointer; text-decoration: underline; }
+  .config-skip:hover { color: var(--text-muted); }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 32px; height: 32px; background: var(--accent);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 1.8; }
+  .header-title { font-size: 14px; font-weight: 500; }
+  .header-sub { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .sync-status { font-size: 11px; color: var(--text-hint); font-family: var(--mono); display: flex; align-items: center; gap: 5px; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-hint); flex-shrink: 0; }
+  .sync-dot.ok { background: #2d9e5a; }
+  .sync-dot.err { background: var(--danger); }
+  .sync-dot.loading { background: var(--warn); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .btn-icon { background: none; border: 1px solid var(--border); border-radius: var(--radius); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); font-size: 16px; }
+  .btn-icon:hover { background: var(--bg); color: var(--text); }
+
+  /* ── MAIN ── */
+  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+  /* ── STATS ── */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px 14px; }
+  .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; font-family: var(--mono); }
+  .stat-value { font-size: 22px; font-weight: 300; font-family: var(--mono); margin-top: 2px; color: var(--text); }
+  .stat-card.accent { border-color: var(--accent); }
+  .stat-card.accent .stat-value { color: var(--accent); }
+  .progress-bar { height: 3px; background: var(--border-light); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .4s ease; }
+
+  /* ── TOOLBAR ── */
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+  .toolbar input[type=text] {
+    padding: 7px 11px; border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; background: var(--surface); color: var(--text);
+    flex: 1; min-width: 180px; font-family: var(--sans);
+  }
+  .toolbar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .toolbar select {
+    padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; background: var(--surface); color: var(--text);
+    cursor: pointer; font-family: var(--sans);
+  }
+  .btn-add {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius); font-size: 13px;
+    cursor: pointer; white-space: nowrap; font-family: var(--sans);
+    margin-left: auto;
+  }
+  .btn-add:hover { background: var(--accent-text); }
+
+  /* ── ADD FORM ── */
+  .add-form {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1rem 1.25rem;
+    margin-bottom: 1rem; display: none; gap: 10px; flex-wrap: wrap; align-items: flex-end;
+  }
+  .add-form.open { display: flex; }
+  .add-form label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; font-family: var(--mono); display: flex; flex-direction: column; gap: 4px; }
+  .add-form input, .add-form select { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; background: var(--bg); color: var(--text); }
+  .add-form input { width: 280px; }
+  .add-form input:focus, .add-form select:focus { outline: none; border-color: var(--accent); }
+  .btn-save { padding: 7px 16px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; cursor: pointer; }
+  .btn-cancel { padding: 7px 12px; background: none; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; cursor: pointer; color: var(--text-muted); }
+
+  /* ── TABLE ── */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted);
+    border-bottom: 1px solid var(--border); font-family: var(--mono);
+    background: var(--bg);
+  }
+  tbody tr { border-bottom: 1px solid var(--border-light); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #faf9f7; }
+  tbody tr.done { background: #fafaf8; }
+  td { padding: 11px 14px; vertical-align: top; }
+
+  /* checkbox */
+  .cb-wrap { display: flex; align-items: flex-start; padding-top: 1px; }
+  input[type=checkbox] { width: 17px; height: 17px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
+
+  /* aufgabe */
+  .task-text { font-size: 14px; line-height: 1.5; }
+  .done .task-text { text-decoration: line-through; color: var(--text-hint); }
+  .task-bem { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: flex-start; gap: 5px; }
+  .task-bem-icon { flex-shrink: 0; margin-top: 1px; }
+  .bem-input-wrap { margin-top: 6px; }
+  .bem-input-wrap textarea {
+    width: 100%; font-size: 12px; font-family: var(--sans);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 6px 9px; background: var(--bg); color: var(--text);
+    resize: vertical; min-height: 52px;
+  }
+  .bem-input-wrap textarea:focus { outline: none; border-color: var(--accent); }
+  .bem-btn { background: none; border: 1px solid var(--border-light); border-radius: var(--radius); padding: 3px 9px; font-size: 11px; cursor: pointer; color: var(--text-muted); margin-top: 5px; font-family: var(--mono); }
+  .bem-btn:hover { border-color: var(--border); color: var(--text); }
+
+  /* badges */
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-family: var(--mono); white-space: nowrap; }
+  .badge-bereich { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); }
+  .badge-person { background: var(--accent-light); color: var(--accent-text); border: 1px solid #c8dccf; }
+
+  /* del */
+  .del-btn { background: none; border: none; cursor: pointer; color: var(--text-hint); font-size: 17px; line-height: 1; padding: 2px 4px; border-radius: 4px; }
+  .del-btn:hover { color: var(--danger); background: var(--danger-light); }
+
+  /* empty */
+  .empty-row td { text-align: center; padding: 3rem; color: var(--text-hint); font-size: 13px; font-family: var(--mono); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem;
+    background: var(--text); color: #fff;
+    padding: 10px 16px; border-radius: var(--radius);
+    font-size: 13px; font-family: var(--mono);
+    opacity: 0; transform: translateY(8px);
+    transition: all .25s; pointer-events: none; z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.err { background: var(--danger); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    header { padding: 0 1rem; }
+    main { padding: 1rem; }
+    .header-sub { display: none; }
+    .col-bereich, th:nth-child(3) { display: none; }
+    .add-form input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CONFIG OVERLAY -->
+<div id="configOverlay">
+  <div class="config-card">
+    <h2>☁️ Nextcloud-Verbindung einrichten</h2>
+    <p>Damit alle Teilnehmer denselben Stand sehen, werden die Aufgaben über WebDAV auf deiner Nextcloud gespeichert. Richte einmalig einen Zugang ein.</p>
+
+    <div class="config-field">
+      <label>Nextcloud-URL</label>
+      <input type="url" id="cfgUrl" placeholder="https://cloud.meinserver.com" autocomplete="off">
+      <div class="config-hint">Ohne Pfad-Suffix — nur die Basis-URL.</div>
+    </div>
+    <div class="config-field">
+      <label>Benutzername</label>
+      <input type="text" id="cfgUser" placeholder="musikkapelle" autocomplete="off">
+    </div>
+    <div class="config-field">
+      <label>App-Passwort</label>
+      <input type="password" id="cfgPass" placeholder="xxxx-xxxx-xxxx-xxxx" autocomplete="new-password">
+      <div class="config-hint">In Nextcloud → Einstellungen → Sicherheit → App-Passwörter erstellen.</div>
+    </div>
+
+    <button class="btn-primary" onclick="saveConfig()">Verbindung speichern & starten</button>
+    <span class="config-skip" onclick="skipConfig()">Ohne Cloud starten (nur lokal, kein Teilen möglich)</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 12l2 2 4-4M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2"/>
+        <path d="M9 4h6v4H9z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Musikfest 2026 — Aufgaben-Tracker</div>
+      <div class="header-sub">Musikkapelle Wohnrod e.V.</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-status">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">–</span>
+    </div>
+    <button class="btn-icon" onclick="syncNow()" title="Jetzt synchronisieren">↻</button>
+    <button class="btn-icon" onclick="openConfig()" title="Einstellungen">⚙</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="🔍 Aufgabe suchen…" oninput="render()">
+    <select id="filterPerson" onchange="render()"><option value="">Alle Personen</option></select>
+    <select id="filterBereich" onchange="render()"><option value="">Alle Bereiche</option></select>
+    <select id="filterStatus" onchange="render()">
+      <option value="">Alle Status</option>
+      <option value="offen">Offen</option>
+      <option value="erledigt">Erledigt</option>
+    </select>
+    <button class="btn-add" onclick="toggleAddForm()">+ Neue Aufgabe</button>
+  </div>
+
+  <div class="add-form" id="addForm">
+    <label>Aufgabe
+      <input type="text" id="nAufgabe" placeholder="Aufgabenbeschreibung…">
+    </label>
+    <label>Bereich
+      <select id="nBereich">
+        <option>Programm</option><option>Kirche</option><option>Organisation</option>
+        <option>Werbung</option><option>Getränke</option><option>Kaffeebar</option>
+        <option>Essen</option><option>Jugendausbildung</option><option>Sonstiges</option>
+      </select>
+    </label>
+    <label>Person
+      <select id="nPerson">
+        <option>BH</option><option>TM</option><option>JV</option><option>HW</option>
+        <option>FG</option><option>EV</option><option>KS</option><option>RH</option>
+        <option>MM</option><option>VS</option><option>???</option>
+      </select>
+    </label>
+    <button class="btn-save" onclick="addTask()">Hinzufügen</button>
+    <button class="btn-cancel" onclick="toggleAddForm()">Abbrechen</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:38px">✓</th>
+          <th>Aufgabe</th>
+          <th class="col-bereich">Bereich</th>
+          <th style="width:80px">Person</th>
+          <th style="width:36px"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const CFG_KEY = 'mk2026_config';
+const DATA_KEY = 'mk2026_tasks';
+const WEBDAV_FILE = 'musikfest2026_aufgaben.json';
+
+let cfg = { url:'', user:'', pass:'', local:false };
+let tasks = [];
+let nextId = 100;
+let syncTimer = null;
+let dirty = false;
+
+function loadConfig(){
+  try { cfg = JSON.parse(localStorage.getItem(CFG_KEY)) || cfg; } catch(e){}
+  return cfg.url || cfg.local;
+}
+
+function saveConfig(){
+  const url = document.getElementById('cfgUrl').value.trim().replace(/\/+$/,'');
+  const user = document.getElementById('cfgUser').value.trim();
+  const pass = document.getElementById('cfgPass').value;
+  if(!url || !user || !pass){ toast('Bitte alle Felder ausfüllen.','err'); return; }
+  cfg = { url, user, pass, local: false };
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  document.getElementById('configOverlay').classList.add('hidden');
+  initApp();
+}
+
+function skipConfig(){
+  cfg = { url:'', user:'', pass:'', local: true };
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  document.getElementById('configOverlay').classList.add('hidden');
+  initApp();
+}
+
+function openConfig(){
+  document.getElementById('cfgUrl').value = cfg.url || '';
+  document.getElementById('cfgUser').value = cfg.user || '';
+  document.getElementById('cfgPass').value = cfg.pass || '';
+  document.getElementById('configOverlay').classList.remove('hidden');
+}
+
+// ── DEFAULT TASKS ───────────────────────────────────────
+const DEFAULT_TASKS = [
+  {id:1, aufgabe:'Starttermin an MV Hirschfeld kommunizieren', bereich:'Programm', person:'BH'},
+  {id:2, aufgabe:'Chor singt in der Kirche – an Konrad kommunizieren', bereich:'Kirche', person:'FG'},
+  {id:3, aufgabe:'Kirchenprogramm erstellen', bereich:'Kirche', person:'KS'},
+  {id:4, aufgabe:'Blumenschmuck – Barbara anfragen', bereich:'Kirche', person:'TM'},
+  {id:5, aufgabe:'Festausschuss WhatsApp-Gruppe erstellen (VSS + Elias + Ramona)', bereich:'Organisation', person:'HW'},
+  {id:6, aufgabe:'Arbeitseinsatz in KMApp eintragen', bereich:'Organisation', person:'BH'},
+  {id:7, aufgabe:'Gastkapelle: Kontakt an HW weitergeben', bereich:'Organisation', person:'BH'},
+  {id:8, aufgabe:'CopyShop beauftragen', bereich:'Organisation', person:'HW'},
+  {id:9, aufgabe:'Festanmeldungen bei Gemeinde einreichen', bereich:'Organisation', person:'BH'},
+  {id:10, aufgabe:'GEMA anmelden', bereich:'Organisation', person:'HW'},
+  {id:11, aufgabe:'Dienstpläne befüllen', bereich:'Organisation', person:'EV/TM'},
+  {id:12, aufgabe:'Zelt: Wunschtermin Mittwoch Abend mit Freund koordinieren', bereich:'Organisation', person:'TM'},
+  {id:13, aufgabe:'Spülmaschine: neues Modell von Gemeinde reservieren + Support-Kontakt klären', bereich:'Organisation', person:'BH'},
+  {id:14, aufgabe:'Holzreste von Post besorgen (Unterbau Festutensilien)', bereich:'Organisation', person:'EV'},
+  {id:15, aufgabe:'Schirminnenbeleuchtung organisieren', bereich:'Organisation', person:'HW'},
+  {id:16, aufgabe:'Strom: Abba anfragen', bereich:'Organisation', person:'HW'},
+  {id:17, aufgabe:'Zewa 2 Pack für Küche & Kaffeebar bestellen', bereich:'Organisation', person:'JV'},
+  {id:18, aufgabe:'Süßigkeiten, Klopapier, Servietten bestellen', bereich:'Organisation', person:'JV'},
+  {id:19, aufgabe:'Kleine wasserfeste Platzdeckchen für alle Tische (Wachstuch bei JYSK)', bereich:'Organisation', person:'HW'},
+  {id:20, aufgabe:'Edding 6x bestellen', bereich:'Organisation', person:'JV'},
+  {id:21, aufgabe:'Werbung in SinngrundApp schalten', bereich:'Werbung', person:'BH'},
+  {id:22, aufgabe:'Mitteilungsblatt – 3 Wochen zuvor: Vereinsnachrichten', bereich:'Werbung', person:'HW'},
+  {id:23, aufgabe:'Mitteilungsblatt – 1 Woche zuvor: Original + Programm', bereich:'Werbung', person:'HW'},
+  {id:24, aufgabe:'Plakate: mit Claus besprechen', bereich:'Werbung', person:'HW'},
+  {id:25, aufgabe:'Plakatgröße für Ortseingang Fellen vermessen – Plakat anpassen', bereich:'Werbung', person:'???'},
+  {id:26, aufgabe:'Zahlen für Plakat bei Weberwerbung bestellen – mit WM klären', bereich:'Werbung', person:'TM'},
+  {id:27, aufgabe:'Rollup für Musikausbildung – Fotos erstellen', bereich:'Werbung', person:'???'},
+  {id:28, aufgabe:'Zapfanlage: Preis bei Detlef erfragen (Ausleihe von Eli möglich)', bereich:'Getränke', person:'JV'},
+  {id:29, aufgabe:'Schild für Theke erstellen (Krugpfand 10 €)', bereich:'Getränke', person:'HW'},
+  {id:30, aufgabe:'Sekt 2x Kisten Metternich besorgen', bereich:'Getränke', person:'HW'},
+  {id:31, aufgabe:'Barspender ins Musikheim bringen', bereich:'Getränke', person:'EV'},
+  {id:32, aufgabe:'Plastikbecher anstatt Gläser für Bar besorgen', bereich:'Getränke', person:'JV'},
+  {id:33, aufgabe:'Spülbürste-Bar im Musikheim suchen', bereich:'Getränke', person:'BH'},
+  {id:34, aufgabe:'Sektgläser prüfen – ggf. bei Faschingsverein leihen', bereich:'Getränke', person:'TM'},
+  {id:35, aufgabe:'Weigand: Liefertermin auf spätestens Mittwoch Abend abstimmen', bereich:'Getränke', person:'JV'},
+  {id:36, aufgabe:'Christoph Schreiber zum Ablagen anfragen', bereich:'Getränke', person:'FG'},
+  {id:37, aufgabe:'2. Kaffeemaschine bei Steffen Bäcker organisieren', bereich:'Kaffeebar', person:'HW'},
+  {id:38, aufgabe:'Kaffee-Zubehör (Zucker etc.) besorgen', bereich:'Kaffeebar', person:'RH'},
+  {id:39, aufgabe:'Preis für Zukauf Kaffeegeschirr klären (ca. 50 Stück)', bereich:'Kaffeebar', person:'???'},
+  {id:40, aufgabe:'Bäcker Zyphus anfragen für frische Backwaren Sa & So', bereich:'Essen', person:'JV'},
+  {id:41, aufgabe:'Schupfnudel bei Wirts bestellen', bereich:'Essen', person:'JV'},
+  {id:42, aufgabe:'Warmhaltebox für Schupfnudel besorgen', bereich:'Essen', person:'JV'},
+  {id:43, aufgabe:'Ralf Vestweber & Andreas Interwies zum Grillaufbau einladen', bereich:'Essen', person:'EV/JV/FG'},
+  {id:44, aufgabe:'Gyrospfanne mit Andreas Interwies klären', bereich:'Essen', person:'FG'},
+  {id:45, aufgabe:'6x Grillschürze bestellen', bereich:'Essen', person:'JV'},
+  {id:46, aufgabe:'Gasflaschen-Doppeladapter-Sammelstück 2x bestellen', bereich:'Essen', person:'FG'},
+  {id:47, aufgabe:'Bon-Kasse für Essen besorgen (95 € bei Fa. Dildey, Frammersbach)', bereich:'Essen', person:'TM'},
+  {id:48, aufgabe:'Nicole Schott: Schlüsselübergabe + Marina einführen', bereich:'Jugendausbildung', person:'VS'},
+  {id:49, aufgabe:'Aufwandsentschädigung für Übungsleiter klären (z.B. NBMB / Albert)', bereich:'Jugendausbildung', person:'TM/JV'},
+  {id:50, aufgabe:'Marina: Stundenerfassung & Abrechnung ab Sep 2026 vorbereiten', bereich:'Jugendausbildung', person:'JV'},
+].map(t => ({...t, erledigt:false, bemerkung:'', showBem:false}));
+
+// ── DATA ────────────────────────────────────────────────
+function localLoad(){
+  try {
+    const d = JSON.parse(localStorage.getItem(DATA_KEY));
+    if(d){ tasks = d.tasks; nextId = d.nextId || 100; return true; }
+  } catch(e){}
+  return false;
+}
+function localSave(){
+  localStorage.setItem(DATA_KEY, JSON.stringify({tasks, nextId}));
+}
+
+// ── WEBDAV ──────────────────────────────────────────────
+function davUrl(){ return `${cfg.url}/remote.php/dav/files/${cfg.user}/${WEBDAV_FILE}`; }
+function davHeaders(){ return { 'Authorization': 'Basic ' + btoa(cfg.user + ':' + cfg.pass), 'Content-Type': 'application/json' }; }
+
+async function davLoad(){
+  setSyncStatus('loading','Lade…');
+  try {
+    const r = await fetch(davUrl(), { method:'GET', headers: davHeaders() });
+    if(r.status === 404){
+      setSyncStatus('ok','Neu angelegt');
+      await davSave();
+      return;
+    }
+    if(!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    tasks = d.tasks || DEFAULT_TASKS;
+    nextId = d.nextId || 100;
+    localSave();
+    setSyncStatus('ok', 'Synchronisiert');
+    render();
+  } catch(e){
+    setSyncStatus('err','Fehler: ' + e.message);
+    toast('Cloud-Laden fehlgeschlagen – zeige lokale Daten.','err');
+    if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); }
+    render();
+  }
+}
+
+async function davSave(){
+  if(cfg.local) return;
+  setSyncStatus('loading','Speichere…');
+  try {
+    const r = await fetch(davUrl(), {
+      method: 'PUT',
+      headers: davHeaders(),
+      body: JSON.stringify({tasks, nextId})
+    });
+    if(!r.ok) throw new Error(r.status);
+    setSyncStatus('ok', new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}));
+    localSave();
+    dirty = false;
+  } catch(e){
+    setSyncStatus('err','Speichern fehlgeschlagen');
+    toast('Cloud-Speichern fehlgeschlagen – lokal gespeichert.','err');
+    localSave();
+  }
+}
+
+function setSyncStatus(state, text){
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncText');
+  dot.className = 'sync-dot ' + state;
+  txt.textContent = text;
+}
+
+async function syncNow(){
+  if(cfg.local){ toast('Kein Cloud-Konto konfiguriert.','err'); return; }
+  await davLoad();
+}
+
+function scheduleSave(){
+  dirty = true;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async ()=>{
+    if(dirty){ await davSave(); }
+  }, 1500);
+}
+
+// ── INIT ────────────────────────────────────────────────
+async function initApp(){
+  if(cfg.local){
+    setSyncStatus('', 'Lokal');
+    if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); localSave(); }
+    render();
+  } else {
+    if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); }
+    render();
+    await davLoad();
+  }
+  setInterval(()=>{ if(!cfg.local && !dirty) davLoad(); }, 60000);
+}
+
+// ── UI ──────────────────────────────────────────────────
+function populateFilters(){
+  const persons = [...new Set(tasks.map(t=>t.person))].sort();
+  const bereiche = [...new Set(tasks.map(t=>t.bereich))].sort();
+  const fp = document.getElementById('filterPerson');
+  const fb = document.getElementById('filterBereich');
+  const cp = fp.value, cb = fb.value;
+  fp.innerHTML = '<option value="">Alle Personen</option>' + persons.map(p=>`<option value="${p}">${p}</option>`).join('');
+  fb.innerHTML = '<option value="">Alle Bereiche</option>' + bereiche.map(b=>`<option value="${b}">${b}</option>`).join('');
+  fp.value = cp; fb.value = cb;
+}
+
+function render(){
+  populateFilters();
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const fp = document.getElementById('filterPerson').value;
+  const fb = document.getElementById('filterBereich').value;
+  const fs = document.getElementById('filterStatus').value;
+
+  const filtered = tasks.filter(t=>{
+    if(fp && !t.person.includes(fp)) return false;
+    if(fb && t.bereich !== fb) return false;
+    if(fs==='offen' && t.erledigt) return false;
+    if(fs==='erledigt' && !t.erledigt) return false;
+    if(search && !t.aufgabe.toLowerCase().includes(search)
+       && !t.bereich.toLowerCase().includes(search)
+       && !t.person.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const total = tasks.length;
+  const done = tasks.filter(t=>t.erledigt).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Gesamt</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card accent"><div class="stat-label">Erledigt</div><div class="stat-value">${done}</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+    <div class="stat-card"><div class="stat-label">Offen</div><div class="stat-value">${total-done}</div></div>
+    <div class="stat-card"><div class="stat-label">Angezeigt</div><div class="stat-value">${filtered.length}</div></div>
+  `;
+
+  const tbody = document.getElementById('tbody');
+  if(!filtered.length){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Keine Aufgaben gefunden.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(t=>`
+    <tr class="${t.erledigt?'done':''}" id="row${t.id}">
+      <td class="cb-wrap"><input type="checkbox" ${t.erledigt?'checked':''} onchange="toggle(${t.id},this.checked)" title="Erledigt markieren"></td>
+      <td>
+        <div class="task-text">${esc(t.aufgabe)}</div>
+        ${t.bemerkung && !t.showBem ? `<div class="task-bem"><span class="task-bem-icon">💬</span><span>${esc(t.bemerkung)}</span></div>` : ''}
+        ${t.showBem ? `<div class="bem-input-wrap"><textarea placeholder="Bemerkung eingeben…" onchange="setBem(${t.id},this.value)">${esc(t.bemerkung)}</textarea></div>` : ''}
+        <button class="bem-btn" onclick="toggleBem(${t.id})">${t.showBem ? '↑ Schließen' : '+ Bemerkung'}</button>
+      </td>
+      <td class="col-bereich"><span class="badge badge-bereich">${esc(t.bereich)}</span></td>
+      <td><span class="badge badge-person">${esc(t.person)}</span></td>
+      <td><button class="del-btn" onclick="deleteTask(${t.id})" title="Löschen">×</button></td>
+    </tr>
+  `).join('');
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toggle(id, checked){
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.erledigt=checked; scheduleSave(); render(); }
+}
+function toggleBem(id){
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.showBem=!t.showBem; render(); }
+}
+function setBem(id, val){
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.bemerkung=val; scheduleSave(); }
+}
+function deleteTask(id){
+  if(!confirm('Aufgabe wirklich löschen?')) return;
+  tasks = tasks.filter(x=>x.id!==id);
+  scheduleSave(); render();
+}
+function toggleAddForm(){
+  document.getElementById('addForm').classList.toggle('open');
+}
+function addTask(){
+  const a = document.getElementById('nAufgabe').value.trim();
+  if(!a){ toast('Bitte Aufgabe eingeben.','err'); return; }
+  tasks.push({ id:nextId++, aufgabe:a, bereich:document.getElementById('nBereich').value, person:document.getElementById('nPerson').value, erledigt:false, bemerkung:'', showBem:false });
+  document.getElementById('nAufgabe').value='';
+  scheduleSave(); render();
+  toggleAddForm();
+  toast('Aufgabe hinzugefügt.');
+}
+
+function toast(msg, type=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type?' '+type:'');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.className='toast'; }, 3000);
+}
+
+// ── BOOT ────────────────────────────────────────────────
+if(loadConfig()){
+  document.getElementById('configOverlay').classList.add('hidden');
+  initApp();
+} else {
+  // show config overlay on first run
+}
+</script>
+</body>
+</html>
