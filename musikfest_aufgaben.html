@@ -41,30 +41,7 @@
     line-height: 1.5;
   }
 
-  /* ── CONFIG OVERLAY ── */
-  #configOverlay {
-    position: fixed; inset: 0; background: rgba(26,24,21,0.55);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 1000; backdrop-filter: blur(2px);
-  }
-  #configOverlay.hidden { display: none; }
-  .config-card {
-    background: var(--surface); border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-    padding: 2rem; width: min(440px, 92vw);
-  }
-  .config-card h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
-  .config-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
-  .config-field { margin-bottom: 1rem; }
-  .config-field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; font-family: var(--mono); }
-  .config-field input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: var(--mono); background: var(--bg); color: var(--text); }
-  .config-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
-  .config-hint { font-size: 11px; color: var(--text-hint); margin-top: 4px; }
-  .btn-primary { width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; }
-  .btn-primary:hover { background: var(--accent-text); }
-  .config-skip { display: block; text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-hint); cursor: pointer; text-decoration: underline; }
-  .config-skip:hover { color: var(--text-muted); }
+  
 
   /* ── HEADER ── */
   header {
@@ -156,10 +133,10 @@
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: #faf9f7; }
   tbody tr.done { background: #fafaf8; }
-  td { padding: 11px 14px; vertical-align: top; }
+  td { padding: 0 14px; vertical-align: middle; height: 46px; }
 
   /* checkbox */
-  .cb-wrap { display: flex; align-items: flex-start; padding-top: 1px; }
+  .cb-wrap { display: table-cell; vertical-align: middle; text-align: center; height: 46px; }
   input[type=checkbox] { width: 17px; height: 17px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 
   /* aufgabe */
@@ -179,16 +156,53 @@
   .bem-btn:hover { border-color: var(--border); color: var(--text); }
 
   /* badges */
-  .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-family: var(--mono); white-space: nowrap; }
-  .badge-bereich { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); }
-  .badge-person { background: var(--accent-light); color: var(--accent-text); border: 1px solid #c8dccf; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-family: var(--mono); white-space: nowrap; }
+  .badge-bereich { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; }
+  .badge-person { background: var(--accent-light); color: var(--accent-text); border: 1px solid #c8dccf; font-size: 13px; font-weight: 500; }
 
   /* del */
   .del-btn { background: none; border: none; cursor: pointer; color: var(--text-hint); font-size: 17px; line-height: 1; padding: 2px 4px; border-radius: 4px; }
   .del-btn:hover { color: var(--danger); background: var(--danger-light); }
 
+  /* bemerkung column */
+  .bem-cell { min-width: 200px; }
+  .bem-placeholder { font-size: 12px; color: var(--text-hint); font-style: italic; }
+  .bem-cell-text { font-size: 12px; color: var(--text-muted); }
+  .bem-inline { width: 100%; font-size: 12px; font-family: var(--sans); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; background: var(--bg); color: var(--text); resize: none; height: 32px; }
+  .bem-inline:focus { outline: none; border-color: var(--accent); }
+
+  /* action buttons */
+  .action-btn { background: none; border: none; cursor: pointer; padding: 3px 5px; border-radius: var(--radius); font-size: 15px; line-height: 1; color: var(--text-hint); }
+  .action-btn:hover { background: var(--bg); color: var(--text); }
+  .action-btn.edit:hover { color: var(--accent); }
+  .action-btn.del:hover { color: var(--danger); background: var(--danger-light); }
+  .actions-cell { white-space: nowrap; width: 60px; }
+
+  /* edit modal */
+  #editModal { position: fixed; inset: 0; background: rgba(26,24,21,0.55); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+  #editModal.hidden { display: none; }
+  .edit-card { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-md); padding: 1.5rem; width: min(460px, 92vw); }
+  .edit-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 1.25rem; }
+  .edit-field { margin-bottom: 1rem; }
+  .edit-field label { display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; font-family: var(--mono); }
+  .edit-field input, .edit-field select, .edit-field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: var(--sans); background: var(--bg); color: var(--text); }
+  .edit-field textarea { resize: vertical; min-height: 60px; }
+  .edit-field input:focus, .edit-field select:focus, .edit-field textarea:focus { outline: none; border-color: var(--accent); }
+  .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+
+  /* sortable headers */
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { color: var(--text); background: var(--border-light); }
+  th.sortable .sort-arrow { margin-left: 4px; opacity: 0.4; font-size: 10px; }
+  th.sortable.asc .sort-arrow::after { content: '▲'; opacity: 1; }
+  th.sortable.desc .sort-arrow::after { content: '▼'; opacity: 1; }
+  th.sortable:not(.asc):not(.desc) .sort-arrow::after { content: '⇅'; }
+
   /* empty */
   .empty-row td { text-align: center; padding: 3rem; color: var(--text-hint); font-size: 13px; font-family: var(--mono); }
+
+  /* hide old bem styles no longer needed */
+  .task-bem, .bem-input-wrap, .bem-btn { display: none; }
 
   /* ── TOAST ── */
   .toast {
@@ -213,27 +227,6 @@
 </style>
 </head>
 <body>
-
-<!-- CONFIG OVERLAY -->
-<div id="configOverlay">
-  <div class="config-card">
-    <h2>☁️ Nextcloud-Verbindung einrichten</h2>
-    <p>Damit alle Teilnehmer denselben Stand sehen, werden die Aufgaben über WebDAV auf deiner Nextcloud gespeichert. Richte einmalig einen Zugang ein.</p>
-
-    <div class="config-field">
-      <label>Nextcloud-URL</label>
-      <input type="url" id="cfgUrl" placeholder="https://cloud.meinserver.com" autocomplete="off">
-      <div class="config-hint">Ohne Pfad-Suffix — nur die Basis-URL.</div>
-    </div>
-    <div class="config-field">
-      <label>Benutzername</label>
-      <input type="text" id="cfgUser" placeholder="musikkapelle" autocomplete="off">
-    </div>
-    <div class="config-field">
-      <label>App-Passwort</label>
-      <input type="password" id="cfgPass" placeholder="xxxx-xxxx-xxxx-xxxx" autocomplete="new-password">
-      <div class="config-hint">In Nextcloud → Einstellungen → Sicherheit → App-Passwörter erstellen.</div>
-    </div>
 
     <button class="btn-primary" onclick="saveConfig()">Verbindung speichern & starten</button>
     <span class="config-skip" onclick="skipConfig()">Ohne Cloud starten (nur lokal, kein Teilen möglich)</span>
@@ -260,7 +253,7 @@
       <span id="syncText">–</span>
     </div>
     <button class="btn-icon" onclick="syncNow()" title="Jetzt synchronisieren">↻</button>
-    <button class="btn-icon" onclick="openConfig()" title="Einstellungen">⚙</button>
+    
   </div>
 </header>
 
@@ -285,18 +278,22 @@
       <input type="text" id="nAufgabe" placeholder="Aufgabenbeschreibung…">
     </label>
     <label>Bereich
-      <select id="nBereich">
+      <select id="nBereich" onchange="handleNewOption(this,'nBereichNew')">
         <option>Programm</option><option>Kirche</option><option>Organisation</option>
         <option>Werbung</option><option>Getränke</option><option>Kaffeebar</option>
         <option>Essen</option><option>Jugendausbildung</option><option>Sonstiges</option>
+        <option value="__new__">+ Neu…</option>
       </select>
+      <input type="text" id="nBereichNew" placeholder="Bereich eingeben…" style="display:none;margin-top:4px">
     </label>
     <label>Person
-      <select id="nPerson">
-        <option>BH</option><option>TM</option><option>JV</option><option>HW</option>
-        <option>FG</option><option>EV</option><option>KS</option><option>RH</option>
+      <select id="nPerson" onchange="handleNewOption(this,'nPersonNew')">
+        <option>Nickels</option><option>Thiemo</option><option>Jannis</option><option>Harry</option>
+        <option>Flobbes</option><option>Eli</option><option>KS</option><option>RH</option>
         <option>MM</option><option>VS</option><option>???</option>
+        <option value="__new__">+ Neu…</option>
       </select>
+      <input type="text" id="nPersonNew" placeholder="Name eingeben…" style="display:none;margin-top:4px">
     </label>
     <button class="btn-save" onclick="addTask()">Hinzufügen</button>
     <button class="btn-cancel" onclick="toggleAddForm()">Abbrechen</button>
@@ -307,10 +304,11 @@
       <thead>
         <tr>
           <th style="width:38px">✓</th>
-          <th>Aufgabe</th>
-          <th class="col-bereich">Bereich</th>
-          <th style="width:80px">Person</th>
-          <th style="width:36px"></th>
+          <th class="sortable" data-col="aufgabe" onclick="sortBy('aufgabe')">Aufgabe <span class="sort-arrow"></span></th>
+          <th class="sortable col-bereich" data-col="bereich" onclick="sortBy('bereich')">Bereich <span class="sort-arrow"></span></th>
+          <th class="sortable" data-col="person" onclick="sortBy('person')" style="width:130px">Person <span class="sort-arrow"></span></th>
+          <th class="bem-cell">Bemerkung</th>
+          <th class="actions-cell"></th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -318,152 +316,103 @@
   </div>
 </main>
 
+<!-- EDIT MODAL -->
+<div id="editModal" class="hidden">
+  <div class="edit-card">
+    <h3>Eintrag bearbeiten</h3>
+    <div class="edit-field">
+      <label>Aufgabe</label>
+      <textarea id="eAufgabe" rows="3"></textarea>
+    </div>
+    <div class="edit-field">
+      <label>Bereich</label>
+      <select id="eBereich" onchange="handleNewOption(this,'eBereichNew')">
+        <option>Programm</option><option>Kirche</option><option>Organisation</option>
+        <option>Werbung</option><option>Getränke</option><option>Kaffeebar</option>
+        <option>Essen</option><option>Jugendausbildung</option><option>Sonstiges</option>
+        <option value="__new__">+ Neu…</option>
+      </select>
+      <input type="text" id="eBereichNew" placeholder="Bereich eingeben…" style="display:none;margin-top:4px">
+    </div>
+    <div class="edit-field">
+      <label>Person</label>
+      <select id="ePerson" onchange="handleNewOption(this,'ePersonNew')">
+        <option>Nickels</option><option>Thiemo</option><option>Jannis</option><option>Harry</option>
+        <option>Flobbes</option><option>Eli</option><option>KS</option><option>RH</option>
+        <option>MM</option><option>VS</option><option>???</option>
+        <option value="__new__">+ Neu…</option>
+      </select>
+      <input type="text" id="ePersonNew" placeholder="Name eingeben…" style="display:none;margin-top:4px">
+    </div>
+    <div class="edit-actions">
+      <button class="btn-cancel" onclick="closeEdit()">Abbrechen</button>
+      <button class="btn-save" onclick="saveEdit()">Speichern</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────
-const CFG_KEY = 'mk2026_config';
-const DATA_KEY = 'mk2026_tasks';
-const WEBDAV_FILE = 'musikfest2026_aufgaben.json';
+// ── JSONBIN CONFIG ──────────────────────────────────────
+const BIN_ID = '6a18aad721f9ee59d296fa58';
+const API_KEY = '$2a$10$Rb4DrJJKyV/cyI5A7dWWweit/CYNqePfelRYeZTOhy5A/Rn5hwPrK';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-let cfg = { url:'', user:'', pass:'', local:false };
 let tasks = [];
 let nextId = 100;
 let syncTimer = null;
 let dirty = false;
 
-function loadConfig(){
-  try { cfg = JSON.parse(localStorage.getItem(CFG_KEY)) || cfg; } catch(e){}
-  return cfg.url || cfg.local;
+// ── LOCAL FALLBACK ───────────────────────────────────────
+function localSave(){
+  try { localStorage.setItem('mk2026_local', JSON.stringify({tasks, nextId})); } catch(e){}
 }
-
-function saveConfig(){
-  const url = document.getElementById('cfgUrl').value.trim().replace(/\/+$/,'');
-  const user = document.getElementById('cfgUser').value.trim();
-  const pass = document.getElementById('cfgPass').value;
-  if(!url || !user || !pass){ toast('Bitte alle Felder ausfüllen.','err'); return; }
-  cfg = { url, user, pass, local: false };
-  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
-  document.getElementById('configOverlay').classList.add('hidden');
-  initApp();
-}
-
-function skipConfig(){
-  cfg = { url:'', user:'', pass:'', local: true };
-  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
-  document.getElementById('configOverlay').classList.add('hidden');
-  initApp();
-}
-
-function openConfig(){
-  document.getElementById('cfgUrl').value = cfg.url || '';
-  document.getElementById('cfgUser').value = cfg.user || '';
-  document.getElementById('cfgPass').value = cfg.pass || '';
-  document.getElementById('configOverlay').classList.remove('hidden');
-}
-
-// ── DEFAULT TASKS ───────────────────────────────────────
-const DEFAULT_TASKS = [
-  {id:1, aufgabe:'Starttermin an MV Hirschfeld kommunizieren', bereich:'Programm', person:'BH'},
-  {id:2, aufgabe:'Chor singt in der Kirche – an Konrad kommunizieren', bereich:'Kirche', person:'FG'},
-  {id:3, aufgabe:'Kirchenprogramm erstellen', bereich:'Kirche', person:'KS'},
-  {id:4, aufgabe:'Blumenschmuck – Barbara anfragen', bereich:'Kirche', person:'TM'},
-  {id:5, aufgabe:'Festausschuss WhatsApp-Gruppe erstellen (VSS + Elias + Ramona)', bereich:'Organisation', person:'HW'},
-  {id:6, aufgabe:'Arbeitseinsatz in KMApp eintragen', bereich:'Organisation', person:'BH'},
-  {id:7, aufgabe:'Gastkapelle: Kontakt an HW weitergeben', bereich:'Organisation', person:'BH'},
-  {id:8, aufgabe:'CopyShop beauftragen', bereich:'Organisation', person:'HW'},
-  {id:9, aufgabe:'Festanmeldungen bei Gemeinde einreichen', bereich:'Organisation', person:'BH'},
-  {id:10, aufgabe:'GEMA anmelden', bereich:'Organisation', person:'HW'},
-  {id:11, aufgabe:'Dienstpläne befüllen', bereich:'Organisation', person:'EV/TM'},
-  {id:12, aufgabe:'Zelt: Wunschtermin Mittwoch Abend mit Freund koordinieren', bereich:'Organisation', person:'TM'},
-  {id:13, aufgabe:'Spülmaschine: neues Modell von Gemeinde reservieren + Support-Kontakt klären', bereich:'Organisation', person:'BH'},
-  {id:14, aufgabe:'Holzreste von Post besorgen (Unterbau Festutensilien)', bereich:'Organisation', person:'EV'},
-  {id:15, aufgabe:'Schirminnenbeleuchtung organisieren', bereich:'Organisation', person:'HW'},
-  {id:16, aufgabe:'Strom: Abba anfragen', bereich:'Organisation', person:'HW'},
-  {id:17, aufgabe:'Zewa 2 Pack für Küche & Kaffeebar bestellen', bereich:'Organisation', person:'JV'},
-  {id:18, aufgabe:'Süßigkeiten, Klopapier, Servietten bestellen', bereich:'Organisation', person:'JV'},
-  {id:19, aufgabe:'Kleine wasserfeste Platzdeckchen für alle Tische (Wachstuch bei JYSK)', bereich:'Organisation', person:'HW'},
-  {id:20, aufgabe:'Edding 6x bestellen', bereich:'Organisation', person:'JV'},
-  {id:21, aufgabe:'Werbung in SinngrundApp schalten', bereich:'Werbung', person:'BH'},
-  {id:22, aufgabe:'Mitteilungsblatt – 3 Wochen zuvor: Vereinsnachrichten', bereich:'Werbung', person:'HW'},
-  {id:23, aufgabe:'Mitteilungsblatt – 1 Woche zuvor: Original + Programm', bereich:'Werbung', person:'HW'},
-  {id:24, aufgabe:'Plakate: mit Claus besprechen', bereich:'Werbung', person:'HW'},
-  {id:25, aufgabe:'Plakatgröße für Ortseingang Fellen vermessen – Plakat anpassen', bereich:'Werbung', person:'???'},
-  {id:26, aufgabe:'Zahlen für Plakat bei Weberwerbung bestellen – mit WM klären', bereich:'Werbung', person:'TM'},
-  {id:27, aufgabe:'Rollup für Musikausbildung – Fotos erstellen', bereich:'Werbung', person:'???'},
-  {id:28, aufgabe:'Zapfanlage: Preis bei Detlef erfragen (Ausleihe von Eli möglich)', bereich:'Getränke', person:'JV'},
-  {id:29, aufgabe:'Schild für Theke erstellen (Krugpfand 10 €)', bereich:'Getränke', person:'HW'},
-  {id:30, aufgabe:'Sekt 2x Kisten Metternich besorgen', bereich:'Getränke', person:'HW'},
-  {id:31, aufgabe:'Barspender ins Musikheim bringen', bereich:'Getränke', person:'EV'},
-  {id:32, aufgabe:'Plastikbecher anstatt Gläser für Bar besorgen', bereich:'Getränke', person:'JV'},
-  {id:33, aufgabe:'Spülbürste-Bar im Musikheim suchen', bereich:'Getränke', person:'BH'},
-  {id:34, aufgabe:'Sektgläser prüfen – ggf. bei Faschingsverein leihen', bereich:'Getränke', person:'TM'},
-  {id:35, aufgabe:'Weigand: Liefertermin auf spätestens Mittwoch Abend abstimmen', bereich:'Getränke', person:'JV'},
-  {id:36, aufgabe:'Christoph Schreiber zum Ablagen anfragen', bereich:'Getränke', person:'FG'},
-  {id:37, aufgabe:'2. Kaffeemaschine bei Steffen Bäcker organisieren', bereich:'Kaffeebar', person:'HW'},
-  {id:38, aufgabe:'Kaffee-Zubehör (Zucker etc.) besorgen', bereich:'Kaffeebar', person:'RH'},
-  {id:39, aufgabe:'Preis für Zukauf Kaffeegeschirr klären (ca. 50 Stück)', bereich:'Kaffeebar', person:'???'},
-  {id:40, aufgabe:'Bäcker Zyphus anfragen für frische Backwaren Sa & So', bereich:'Essen', person:'JV'},
-  {id:41, aufgabe:'Schupfnudel bei Wirts bestellen', bereich:'Essen', person:'JV'},
-  {id:42, aufgabe:'Warmhaltebox für Schupfnudel besorgen', bereich:'Essen', person:'JV'},
-  {id:43, aufgabe:'Ralf Vestweber & Andreas Interwies zum Grillaufbau einladen', bereich:'Essen', person:'EV/JV/FG'},
-  {id:44, aufgabe:'Gyrospfanne mit Andreas Interwies klären', bereich:'Essen', person:'FG'},
-  {id:45, aufgabe:'6x Grillschürze bestellen', bereich:'Essen', person:'JV'},
-  {id:46, aufgabe:'Gasflaschen-Doppeladapter-Sammelstück 2x bestellen', bereich:'Essen', person:'FG'},
-  {id:47, aufgabe:'Bon-Kasse für Essen besorgen (95 € bei Fa. Dildey, Frammersbach)', bereich:'Essen', person:'TM'},
-  {id:48, aufgabe:'Nicole Schott: Schlüsselübergabe + Marina einführen', bereich:'Jugendausbildung', person:'VS'},
-  {id:49, aufgabe:'Aufwandsentschädigung für Übungsleiter klären (z.B. NBMB / Albert)', bereich:'Jugendausbildung', person:'TM/JV'},
-  {id:50, aufgabe:'Marina: Stundenerfassung & Abrechnung ab Sep 2026 vorbereiten', bereich:'Jugendausbildung', person:'JV'},
-].map(t => ({...t, erledigt:false, bemerkung:'', showBem:false}));
-
-// ── DATA ────────────────────────────────────────────────
 function localLoad(){
   try {
-    const d = JSON.parse(localStorage.getItem(DATA_KEY));
+    const d = JSON.parse(localStorage.getItem('mk2026_local'));
     if(d){ tasks = d.tasks; nextId = d.nextId || 100; return true; }
   } catch(e){}
   return false;
 }
-function localSave(){
-  localStorage.setItem(DATA_KEY, JSON.stringify({tasks, nextId}));
-}
 
-// ── WEBDAV ──────────────────────────────────────────────
-function davUrl(){ return `${cfg.url}/remote.php/dav/files/${cfg.user}/${WEBDAV_FILE}`; }
-function davHeaders(){ return { 'Authorization': 'Basic ' + btoa(cfg.user + ':' + cfg.pass), 'Content-Type': 'application/json' }; }
-
-async function davLoad(){
+// ── JSONBIN API ──────────────────────────────────────────
+async function binLoad(){
   setSyncStatus('loading','Lade…');
   try {
-    const r = await fetch(davUrl(), { method:'GET', headers: davHeaders() });
-    if(r.status === 404){
-      setSyncStatus('ok','Neu angelegt');
-      await davSave();
-      return;
-    }
+    const r = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': API_KEY }
+    });
     if(!r.ok) throw new Error(r.status);
     const d = await r.json();
-    tasks = d.tasks || DEFAULT_TASKS;
-    nextId = d.nextId || 100;
+    const rec = d.record;
+    if(rec.tasks && rec.tasks.length > 0){
+      tasks = rec.tasks;
+      nextId = rec.nextId || 100;
+    } else if(!localLoad()){
+      tasks = DEFAULT_TASKS.map(t=>({...t}));
+    }
     localSave();
     setSyncStatus('ok', 'Synchronisiert');
     render();
   } catch(e){
     setSyncStatus('err','Fehler: ' + e.message);
-    toast('Cloud-Laden fehlgeschlagen – zeige lokale Daten.','err');
+    toast('Laden fehlgeschlagen – zeige lokale Daten.','err');
     if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); }
     render();
   }
 }
 
-async function davSave(){
-  if(cfg.local) return;
+async function binSave(){
   setSyncStatus('loading','Speichere…');
   try {
-    const r = await fetch(davUrl(), {
+    const r = await fetch(BIN_URL, {
       method: 'PUT',
-      headers: davHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': API_KEY
+      },
       body: JSON.stringify({tasks, nextId})
     });
     if(!r.ok) throw new Error(r.status);
@@ -484,141 +433,26 @@ function setSyncStatus(state, text){
   txt.textContent = text;
 }
 
-async function syncNow(){
-  if(cfg.local){ toast('Kein Cloud-Konto konfiguriert.','err'); return; }
-  await davLoad();
-}
+async function syncNow(){ await binLoad(); }
 
 function scheduleSave(){
   dirty = true;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(async ()=>{
-    if(dirty){ await davSave(); }
+    if(dirty){ await binSave(); }
   }, 1500);
 }
 
 // ── INIT ────────────────────────────────────────────────
 async function initApp(){
-  if(cfg.local){
-    setSyncStatus('', 'Lokal');
-    if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); localSave(); }
-    render();
-  } else {
-    if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); }
-    render();
-    await davLoad();
-  }
-  setInterval(()=>{ if(!cfg.local && !dirty) davLoad(); }, 60000);
-}
-
-// ── UI ──────────────────────────────────────────────────
-function populateFilters(){
-  const persons = [...new Set(tasks.map(t=>t.person))].sort();
-  const bereiche = [...new Set(tasks.map(t=>t.bereich))].sort();
-  const fp = document.getElementById('filterPerson');
-  const fb = document.getElementById('filterBereich');
-  const cp = fp.value, cb = fb.value;
-  fp.innerHTML = '<option value="">Alle Personen</option>' + persons.map(p=>`<option value="${p}">${p}</option>`).join('');
-  fb.innerHTML = '<option value="">Alle Bereiche</option>' + bereiche.map(b=>`<option value="${b}">${b}</option>`).join('');
-  fp.value = cp; fb.value = cb;
-}
-
-function render(){
-  populateFilters();
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const fp = document.getElementById('filterPerson').value;
-  const fb = document.getElementById('filterBereich').value;
-  const fs = document.getElementById('filterStatus').value;
-
-  const filtered = tasks.filter(t=>{
-    if(fp && !t.person.includes(fp)) return false;
-    if(fb && t.bereich !== fb) return false;
-    if(fs==='offen' && t.erledigt) return false;
-    if(fs==='erledigt' && !t.erledigt) return false;
-    if(search && !t.aufgabe.toLowerCase().includes(search)
-       && !t.bereich.toLowerCase().includes(search)
-       && !t.person.toLowerCase().includes(search)) return false;
-    return true;
-  });
-
-  const total = tasks.length;
-  const done = tasks.filter(t=>t.erledigt).length;
-  const pct = total ? Math.round(done/total*100) : 0;
-  document.getElementById('stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Gesamt</div><div class="stat-value">${total}</div></div>
-    <div class="stat-card accent"><div class="stat-label">Erledigt</div><div class="stat-value">${done}</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
-    <div class="stat-card"><div class="stat-label">Offen</div><div class="stat-value">${total-done}</div></div>
-    <div class="stat-card"><div class="stat-label">Angezeigt</div><div class="stat-value">${filtered.length}</div></div>
-  `;
-
-  const tbody = document.getElementById('tbody');
-  if(!filtered.length){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Keine Aufgaben gefunden.</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = filtered.map(t=>`
-    <tr class="${t.erledigt?'done':''}" id="row${t.id}">
-      <td class="cb-wrap"><input type="checkbox" ${t.erledigt?'checked':''} onchange="toggle(${t.id},this.checked)" title="Erledigt markieren"></td>
-      <td>
-        <div class="task-text">${esc(t.aufgabe)}</div>
-        ${t.bemerkung && !t.showBem ? `<div class="task-bem"><span class="task-bem-icon">💬</span><span>${esc(t.bemerkung)}</span></div>` : ''}
-        ${t.showBem ? `<div class="bem-input-wrap"><textarea placeholder="Bemerkung eingeben…" onchange="setBem(${t.id},this.value)">${esc(t.bemerkung)}</textarea></div>` : ''}
-        <button class="bem-btn" onclick="toggleBem(${t.id})">${t.showBem ? '↑ Schließen' : '+ Bemerkung'}</button>
-      </td>
-      <td class="col-bereich"><span class="badge badge-bereich">${esc(t.bereich)}</span></td>
-      <td><span class="badge badge-person">${esc(t.person)}</span></td>
-      <td><button class="del-btn" onclick="deleteTask(${t.id})" title="Löschen">×</button></td>
-    </tr>
-  `).join('');
-}
-
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function toggle(id, checked){
-  const t = tasks.find(x=>x.id===id);
-  if(t){ t.erledigt=checked; scheduleSave(); render(); }
-}
-function toggleBem(id){
-  const t = tasks.find(x=>x.id===id);
-  if(t){ t.showBem=!t.showBem; render(); }
-}
-function setBem(id, val){
-  const t = tasks.find(x=>x.id===id);
-  if(t){ t.bemerkung=val; scheduleSave(); }
-}
-function deleteTask(id){
-  if(!confirm('Aufgabe wirklich löschen?')) return;
-  tasks = tasks.filter(x=>x.id!==id);
-  scheduleSave(); render();
-}
-function toggleAddForm(){
-  document.getElementById('addForm').classList.toggle('open');
-}
-function addTask(){
-  const a = document.getElementById('nAufgabe').value.trim();
-  if(!a){ toast('Bitte Aufgabe eingeben.','err'); return; }
-  tasks.push({ id:nextId++, aufgabe:a, bereich:document.getElementById('nBereich').value, person:document.getElementById('nPerson').value, erledigt:false, bemerkung:'', showBem:false });
-  document.getElementById('nAufgabe').value='';
-  scheduleSave(); render();
-  toggleAddForm();
-  toast('Aufgabe hinzugefügt.');
-}
-
-function toast(msg, type=''){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (type?' '+type:'');
-  clearTimeout(el._t);
-  el._t = setTimeout(()=>{ el.className='toast'; }, 3000);
+  if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); }
+  render();
+  await binLoad();
+  setInterval(()=>{ if(!dirty) binLoad(); }, 60000);
 }
 
 // ── BOOT ────────────────────────────────────────────────
-if(loadConfig()){
-  document.getElementById('configOverlay').classList.add('hidden');
-  initApp();
-} else {
-  // show config overlay on first run
-}
+initApp();
 </script>
 </body>
 </html>
