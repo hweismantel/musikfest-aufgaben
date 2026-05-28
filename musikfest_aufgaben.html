@@ -228,8 +228,7 @@
 </head>
 <body>
 
-    <button class="btn-primary" onclick="saveConfig()">Verbindung speichern & starten</button>
-    <span class="config-skip" onclick="skipConfig()">Ohne Cloud starten (nur lokal, kein Teilen möglich)</span>
+    
   </div>
 </div>
 
@@ -360,24 +359,82 @@ const BIN_ID = '6a18aad721f9ee59d296fa58';
 const API_KEY = '$2a$10$Rb4DrJJKyV/cyI5A7dWWweit/CYNqePfelRYeZTOhy5A/Rn5hwPrK';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
+// ── DEFAULT TASKS ───────────────────────────────────────
+const DEFAULT_TASKS = [
+  {id:1, aufgabe:'Starttermin an MV Hirschfeld kommunizieren', bereich:'Programm', person:'Nickels'},
+  {id:2, aufgabe:'Chor singt in der Kirche – an Konrad kommunizieren', bereich:'Kirche', person:'Flobbes'},
+  {id:3, aufgabe:'Kirchenprogramm erstellen', bereich:'Kirche', person:'KS'},
+  {id:4, aufgabe:'Blumenschmuck – Barbara anfragen', bereich:'Kirche', person:'Thiemo'},
+  {id:5, aufgabe:'Festausschuss WhatsApp-Gruppe erstellen (VSS + Elias + Ramona)', bereich:'Organisation', person:'Harry'},
+  {id:6, aufgabe:'Arbeitseinsatz in KMApp eintragen', bereich:'Organisation', person:'Nickels'},
+  {id:7, aufgabe:'Gastkapelle: Kontakt an HW weitergeben', bereich:'Organisation', person:'Nickels'},
+  {id:8, aufgabe:'CopyShop beauftragen', bereich:'Organisation', person:'Harry'},
+  {id:9, aufgabe:'Festanmeldungen bei Gemeinde einreichen', bereich:'Organisation', person:'Nickels'},
+  {id:10, aufgabe:'GEMA anmelden', bereich:'Organisation', person:'Harry'},
+  {id:11, aufgabe:'Dienstpläne befüllen', bereich:'Organisation', person:'Eli / Thiemo'},
+  {id:12, aufgabe:'Zelt: Wunschtermin Mittwoch Abend mit Freund koordinieren', bereich:'Organisation', person:'Thiemo'},
+  {id:13, aufgabe:'Spülmaschine: neues Modell von Gemeinde reservieren + Support-Kontakt klären', bereich:'Organisation', person:'Nickels'},
+  {id:14, aufgabe:'Holzreste von Post besorgen (Unterbau Festutensilien)', bereich:'Organisation', person:'Eli'},
+  {id:15, aufgabe:'Schirminnenbeleuchtung organisieren', bereich:'Organisation', person:'Harry'},
+  {id:16, aufgabe:'Strom: Abba anfragen', bereich:'Organisation', person:'Harry'},
+  {id:17, aufgabe:'Zewa 2 Pack für Küche & Kaffeebar bestellen', bereich:'Organisation', person:'Jannis'},
+  {id:18, aufgabe:'Süßigkeiten, Klopapier, Servietten bestellen', bereich:'Organisation', person:'Jannis'},
+  {id:19, aufgabe:'Kleine wasserfeste Platzdeckchen für alle Tische (Wachstuch bei JYSK)', bereich:'Organisation', person:'Harry'},
+  {id:20, aufgabe:'Edding 6x bestellen', bereich:'Organisation', person:'Jannis'},
+  {id:21, aufgabe:'Werbung in SinngrundApp schalten', bereich:'Werbung', person:'Nickels'},
+  {id:22, aufgabe:'Mitteilungsblatt – 3 Wochen zuvor: Vereinsnachrichten', bereich:'Werbung', person:'Harry'},
+  {id:23, aufgabe:'Mitteilungsblatt – 1 Woche zuvor: Original + Programm', bereich:'Werbung', person:'Harry'},
+  {id:24, aufgabe:'Plakate: mit Claus besprechen', bereich:'Werbung', person:'Harry'},
+  {id:25, aufgabe:'Plakatgröße für Ortseingang Fellen vermessen – Plakat anpassen', bereich:'Werbung', person:'???'},
+  {id:26, aufgabe:'Zahlen für Plakat bei Weberwerbung bestellen – mit WM klären', bereich:'Werbung', person:'Thiemo'},
+  {id:27, aufgabe:'Rollup für Musikausbildung – Fotos erstellen', bereich:'Werbung', person:'???'},
+  {id:28, aufgabe:'Zapfanlage: Preis bei Detlef erfragen (Ausleihe von Eli möglich)', bereich:'Getränke', person:'Jannis'},
+  {id:29, aufgabe:'Schild für Theke erstellen (Krugpfand 10 €)', bereich:'Getränke', person:'Harry'},
+  {id:30, aufgabe:'Sekt 2x Kisten Metternich besorgen', bereich:'Getränke', person:'Harry'},
+  {id:31, aufgabe:'Barspender ins Musikheim bringen', bereich:'Getränke', person:'Eli'},
+  {id:32, aufgabe:'Plastikbecher anstatt Gläser für Bar besorgen', bereich:'Getränke', person:'Jannis'},
+  {id:33, aufgabe:'Spülbürste-Bar im Musikheim suchen', bereich:'Getränke', person:'Nickels'},
+  {id:34, aufgabe:'Sektgläser prüfen – ggf. bei Faschingsverein leihen', bereich:'Getränke', person:'Thiemo'},
+  {id:35, aufgabe:'Weigand: Liefertermin auf spätestens Mittwoch Abend abstimmen', bereich:'Getränke', person:'Jannis'},
+  {id:36, aufgabe:'Christoph Schreiber zum Ablagen anfragen', bereich:'Getränke', person:'Flobbes'},
+  {id:37, aufgabe:'2. Kaffeemaschine bei Steffen Bäcker organisieren', bereich:'Kaffeebar', person:'Harry'},
+  {id:38, aufgabe:'Kaffee-Zubehör (Zucker etc.) besorgen', bereich:'Kaffeebar', person:'RH'},
+  {id:39, aufgabe:'Preis für Zukauf Kaffeegeschirr klären (ca. 50 Stück)', bereich:'Kaffeebar', person:'???'},
+  {id:40, aufgabe:'Bäcker Zyphus anfragen für frische Backwaren Sa & So', bereich:'Essen', person:'Jannis'},
+  {id:41, aufgabe:'Schupfnudel bei Wirts bestellen', bereich:'Essen', person:'Jannis'},
+  {id:42, aufgabe:'Warmhaltebox für Schupfnudel besorgen', bereich:'Essen', person:'Jannis'},
+  {id:43, aufgabe:'Ralf Vestweber & Andreas Interwies zum Grillaufbau einladen', bereich:'Essen', person:'Eli / Jannis / Flobbes'},
+  {id:44, aufgabe:'Gyrospfanne mit Andreas Interwies klären', bereich:'Essen', person:'Flobbes'},
+  {id:45, aufgabe:'6x Grillschürze bestellen', bereich:'Essen', person:'Jannis'},
+  {id:46, aufgabe:'Gasflaschen-Doppeladapter-Sammelstück 2x bestellen', bereich:'Essen', person:'Flobbes'},
+  {id:47, aufgabe:'Bon-Kasse für Essen besorgen (95 € bei Fa. Dildey, Frammersbach)', bereich:'Essen', person:'Thiemo'},
+  {id:48, aufgabe:'Nicole Schott: Schlüsselübergabe + Marina einführen', bereich:'Jugendausbildung', person:'VS'},
+  {id:49, aufgabe:'Aufwandsentschädigung für Übungsleiter klären (z.B. NBMB / Albert)', bereich:'Jugendausbildung', person:'Thiemo / Jannis'},
+  {id:50, aufgabe:'Marina: Stundenerfassung & Abrechnung ab Sep 2026 vorbereiten', bereich:'Jugendausbildung', person:'Jannis'},
+].map(t => ({...t, erledigt:false, bemerkung:'', showBem:false}));
+
+// ── STATE ────────────────────────────────────────────────
 let tasks = [];
 let nextId = 100;
 let syncTimer = null;
 let dirty = false;
+let sortCol = '';
+let sortDir = 'asc';
+let editId = null;
 
-// ── LOCAL FALLBACK ───────────────────────────────────────
+// ── LOCAL STORAGE ────────────────────────────────────────
 function localSave(){
   try { localStorage.setItem('mk2026_local', JSON.stringify({tasks, nextId})); } catch(e){}
 }
 function localLoad(){
   try {
     const d = JSON.parse(localStorage.getItem('mk2026_local'));
-    if(d){ tasks = d.tasks; nextId = d.nextId || 100; return true; }
+    if(d && d.tasks){ tasks = d.tasks; nextId = d.nextId || 100; return true; }
   } catch(e){}
   return false;
 }
 
-// ── JSONBIN API ──────────────────────────────────────────
+// ── JSONBIN ──────────────────────────────────────────────
 async function binLoad(){
   setSyncStatus('loading','Lade…');
   try {
@@ -387,18 +444,19 @@ async function binLoad(){
     if(!r.ok) throw new Error(r.status);
     const d = await r.json();
     const rec = d.record;
-    if(rec.tasks && rec.tasks.length > 0){
+    if(rec && rec.tasks && rec.tasks.length > 0){
       tasks = rec.tasks;
       nextId = rec.nextId || 100;
-    } else if(!localLoad()){
-      tasks = DEFAULT_TASKS.map(t=>({...t}));
+    } else {
+      if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); nextId = 100; }
+      await binSave();
     }
     localSave();
     setSyncStatus('ok', 'Synchronisiert');
     render();
   } catch(e){
     setSyncStatus('err','Fehler: ' + e.message);
-    toast('Laden fehlgeschlagen – zeige lokale Daten.','err');
+    toast('Laden fehlgeschlagen – lokale Daten werden angezeigt.','err');
     if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); }
     render();
   }
@@ -409,10 +467,7 @@ async function binSave(){
   try {
     const r = await fetch(BIN_URL, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': API_KEY
-      },
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
       body: JSON.stringify({tasks, nextId})
     });
     if(!r.ok) throw new Error(r.status);
@@ -421,7 +476,6 @@ async function binSave(){
     dirty = false;
   } catch(e){
     setSyncStatus('err','Speichern fehlgeschlagen');
-    toast('Cloud-Speichern fehlgeschlagen – lokal gespeichert.','err');
     localSave();
   }
 }
@@ -429,8 +483,8 @@ async function binSave(){
 function setSyncStatus(state, text){
   const dot = document.getElementById('syncDot');
   const txt = document.getElementById('syncText');
-  dot.className = 'sync-dot ' + state;
-  txt.textContent = text;
+  if(dot) dot.className = 'sync-dot ' + state;
+  if(txt) txt.textContent = text;
 }
 
 async function syncNow(){ await binLoad(); }
@@ -438,13 +492,200 @@ async function syncNow(){ await binLoad(); }
 function scheduleSave(){
   dirty = true;
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(async ()=>{
-    if(dirty){ await binSave(); }
-  }, 1500);
+  syncTimer = setTimeout(async ()=>{ if(dirty) await binSave(); }, 1500);
+}
+
+// ── FILTERS & SORT ───────────────────────────────────────
+function sortBy(col){
+  if(sortCol === col){ sortDir = sortDir==='asc'?'desc':'asc'; }
+  else { sortCol = col; sortDir = 'asc'; }
+  document.querySelectorAll('th.sortable').forEach(th=>{
+    th.classList.remove('asc','desc');
+    if(th.dataset.col === col) th.classList.add(sortDir);
+  });
+  render();
+}
+
+function populateFilters(){
+  const persons = [...new Set(tasks.map(t=>t.person))].sort();
+  const bereiche = [...new Set(tasks.map(t=>t.bereich))].sort();
+  const fp = document.getElementById('filterPerson');
+  const fb = document.getElementById('filterBereich');
+  const cp = fp.value, cb = fb.value;
+  fp.innerHTML = '<option value="">Alle Personen</option>' + persons.map(p=>`<option value="${p}">${p}</option>`).join('');
+  fb.innerHTML = '<option value="">Alle Bereiche</option>' + bereiche.map(b=>`<option value="${b}">${b}</option>`).join('');
+  fp.value = cp; fb.value = cb;
+}
+
+// ── RENDER ───────────────────────────────────────────────
+function render(){
+  populateFilters();
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const fp = document.getElementById('filterPerson').value;
+  const fb = document.getElementById('filterBereich').value;
+  const fs = document.getElementById('filterStatus').value;
+
+  let filtered = tasks.filter(t=>{
+    if(fp && !t.person.includes(fp)) return false;
+    if(fb && t.bereich !== fb) return false;
+    if(fs==='offen' && t.erledigt) return false;
+    if(fs==='erledigt' && !t.erledigt) return false;
+    if(search && !t.aufgabe.toLowerCase().includes(search)
+       && !t.bereich.toLowerCase().includes(search)
+       && !t.person.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  if(sortCol){
+    filtered.sort((a,b)=>{
+      const av = (a[sortCol]||'').toLowerCase();
+      const bv = (b[sortCol]||'').toLowerCase();
+      return sortDir==='asc' ? av.localeCompare(bv,'de') : bv.localeCompare(av,'de');
+    });
+  }
+
+  const total = tasks.length;
+  const done = tasks.filter(t=>t.erledigt).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Gesamt</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card accent"><div class="stat-label">Erledigt</div><div class="stat-value">${done}</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+    <div class="stat-card"><div class="stat-label">Offen</div><div class="stat-value">${total-done}</div></div>
+    <div class="stat-card"><div class="stat-label">Angezeigt</div><div class="stat-value">${filtered.length}</div></div>
+  `;
+
+  const tbody = document.getElementById('tbody');
+  if(!filtered.length){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Keine Aufgaben gefunden.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(t=>`
+    <tr class="${t.erledigt?'done':''}" id="row${t.id}">
+      <td class="cb-wrap"><input type="checkbox" ${t.erledigt?'checked':''} onchange="toggle(${t.id},this.checked)"></td>
+      <td><div class="task-text">${esc(t.aufgabe)}</div></td>
+      <td class="col-bereich"><span class="badge badge-bereich">${esc(t.bereich)}</span></td>
+      <td><span class="badge badge-person">${esc(t.person)}</span></td>
+      <td class="bem-cell">
+        ${t.showBem
+          ? `<textarea class="bem-inline" placeholder="Bemerkung…" onchange="setBem(${t.id},this.value)" onblur="closeBem(${t.id})">${esc(t.bemerkung)}</textarea>`
+          : t.bemerkung
+            ? `<span class="bem-cell-text" onclick="toggleBem(${t.id})" style="cursor:pointer">${esc(t.bemerkung)}</span>`
+            : `<span class="bem-placeholder" onclick="toggleBem(${t.id})" style="cursor:pointer">Bemerkung…</span>`
+        }
+      </td>
+      <td class="actions-cell">
+        <button class="action-btn edit" onclick="openEdit(${t.id})" title="Bearbeiten">✏️</button>
+        <button class="action-btn del" onclick="deleteTask(${t.id})" title="Löschen">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── ACTIONS ──────────────────────────────────────────────
+function toggle(id, checked){
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.erledigt=checked; scheduleSave(); render(); }
+}
+function toggleBem(id){
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.showBem=!t.showBem; render(); if(t.showBem){ setTimeout(()=>{ const el=document.querySelector(`#row${id} .bem-inline`); if(el)el.focus(); },50); } }
+}
+function closeBem(id){
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.showBem=false; render(); }
+}
+function setBem(id, val){
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.bemerkung=val; scheduleSave(); }
+}
+function deleteTask(id){
+  if(!confirm('Aufgabe wirklich löschen?')) return;
+  tasks = tasks.filter(x=>x.id!==id);
+  scheduleSave(); render();
+}
+function toggleAddForm(){
+  document.getElementById('addForm').classList.toggle('open');
+}
+
+// ── NEW OPTION HANDLING ──────────────────────────────────
+function handleNewOption(sel, inputId){
+  const inp = document.getElementById(inputId);
+  if(sel.value === '__new__'){ inp.style.display='block'; inp.focus(); }
+  else { inp.style.display='none'; inp.value=''; }
+}
+function resolveSelect(selId, inputId){
+  const sel = document.getElementById(selId);
+  const inp = document.getElementById(inputId);
+  if(sel.value === '__new__'){
+    const v = inp.value.trim();
+    if(!v) return null;
+    return v;
+  }
+  return sel.value;
+}
+
+function addTask(){
+  const a = document.getElementById('nAufgabe').value.trim();
+  if(!a){ toast('Bitte Aufgabe eingeben.','err'); return; }
+  const bereich = resolveSelect('nBereich','nBereichNew');
+  const person = resolveSelect('nPerson','nPersonNew');
+  if(!bereich || !person){ toast('Bitte Bereich und Person angeben.','err'); return; }
+  tasks.push({ id:nextId++, aufgabe:a, bereich, person, erledigt:false, bemerkung:'', showBem:false });
+  document.getElementById('nAufgabe').value='';
+  document.getElementById('nBereichNew').style.display='none';
+  document.getElementById('nPersonNew').style.display='none';
+  scheduleSave(); render(); toggleAddForm();
+  toast('Aufgabe hinzugefügt.');
+}
+
+// ── EDIT MODAL ───────────────────────────────────────────
+function openEdit(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  editId = id;
+  document.getElementById('eAufgabe').value = t.aufgabe;
+  const eb = document.getElementById('eBereich');
+  const ebn = document.getElementById('eBereichNew');
+  const matchB = [...eb.options].find(o=>o.value===t.bereich && o.value!=='__new__');
+  if(matchB){ eb.value=t.bereich; ebn.style.display='none'; }
+  else { eb.value='__new__'; ebn.style.display='block'; ebn.value=t.bereich; }
+  const ep = document.getElementById('ePerson');
+  const epn = document.getElementById('ePersonNew');
+  const matchP = [...ep.options].find(o=>o.value===t.person && o.value!=='__new__');
+  if(matchP){ ep.value=t.person; epn.style.display='none'; }
+  else { ep.value='__new__'; epn.style.display='block'; epn.value=t.person; }
+  document.getElementById('editModal').classList.remove('hidden');
+}
+function closeEdit(){
+  editId = null;
+  document.getElementById('editModal').classList.add('hidden');
+}
+function saveEdit(){
+  const t = tasks.find(x=>x.id===editId);
+  if(!t) return;
+  const aufgabe = document.getElementById('eAufgabe').value.trim();
+  const bereich = resolveSelect('eBereich','eBereichNew');
+  const person = resolveSelect('ePerson','ePersonNew');
+  if(!aufgabe || !bereich || !person){ toast('Bitte alle Felder ausfüllen.','err'); return; }
+  t.aufgabe = aufgabe; t.bereich = bereich; t.person = person;
+  closeEdit(); scheduleSave(); render();
+  toast('Eintrag gespeichert.');
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function toast(msg, type=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type?' '+type:'');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.className='toast'; }, 3000);
 }
 
 // ── INIT ────────────────────────────────────────────────
 async function initApp(){
+  // Show local data immediately, then load from cloud
   if(!localLoad()){ tasks = DEFAULT_TASKS.map(t=>({...t})); }
   render();
   await binLoad();
